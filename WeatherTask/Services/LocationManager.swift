@@ -6,41 +6,37 @@
 //
 
 
+import Foundation
 import CoreLocation
 
 class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
-    private let manager = CLLocationManager()
-    
+    private let locationManager = CLLocationManager()
     @Published var location: CLLocation?
-    @Published var errorMessage: String?
-    
+    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+
     override init() {
         super.init()
-        manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyHundredMeters
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
     }
-    
-    func requestLocation() async {
-        let status = manager.authorizationStatus
-        if status == .notDetermined {
-            manager.requestWhenInUseAuthorization()
-            return
-        }
-        
-        if status == .denied || status == .restricted {
-            errorMessage = "Standortberechtigung verweigert"
-            return
-        }
-        
-        manager.requestLocation()
+
+    func requestLocation() {
+        locationManager.requestLocation()
     }
-    
+
+    func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
+        authorizationStatus = manager.authorizationStatus
+        if authorizationStatus == .authorizedWhenInUse || authorizationStatus == .authorizedAlways {
+            locationManager.requestLocation()
+        }
+    }
+
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         location = locations.last
-        manager.stopUpdatingLocation() // Stoppt nach erstem Ergebnis
     }
 
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        errorMessage = "Fehler: \(error.localizedDescription)"
+        print("Error retrieving location: \(error.localizedDescription)")
     }
 }

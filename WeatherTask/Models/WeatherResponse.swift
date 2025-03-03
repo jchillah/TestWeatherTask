@@ -7,10 +7,24 @@
 
 import Foundation
 
-@MainActor 
 struct WeatherResponse: Codable {
-    struct Main: Codable {
-        var temp: Double
+    let list: [WeatherEntry]
+}
+
+struct WeatherEntry: Codable {
+    let main: MainInfo
+    let weather: [WeatherInfo]
+    let dt: TimeInterval
+
+    var date: Date {
+        return Date(timeIntervalSince1970: dt)
     }
-    var main: Main
+}
+
+struct MainInfo: Codable {
+    let temp: Double
+}
+
+struct WeatherInfo: Codable {
+    let description: String
 }
