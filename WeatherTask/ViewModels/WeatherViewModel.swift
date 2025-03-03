@@ -8,17 +8,19 @@
 import Foundation
 import CoreLocation
 import SwiftUI
+import Combine
 
 @MainActor
 class WeatherViewModel: ObservableObject {
     @Published var weatherInfo: String = "Noch keine Daten"
     @Published var isLoading: Bool = false
-    @Published var appError: AppError?
+    @Published var authError: AuthError?
     @Published var temperature: String = "--"
     @Published var condition: String = "--"
 
     private let weatherService = WeatherService()
     private let locationManager = LocationManager()
+    private var cancellables = Set<AnyCancellable>()
 
     init() {
         locationManager.$location
@@ -40,7 +42,7 @@ class WeatherViewModel: ObservableObject {
                 }
                 isLoading = false
             } catch {
-                appError = AppError(errorString: error.localizedDescription)
+                authError = AuthError(errorString: error.localizedDescription)
                 isLoading = false
             }
         }

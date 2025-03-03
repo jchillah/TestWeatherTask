@@ -37,9 +37,22 @@
 		CFC3CBF12D60B60F003D0E06 /* WeatherTask.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = WeatherTask.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CFF915512D761CC6007E2B0B /* Exceptions for "WeatherTask" folder in "WeatherTask" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CFC3CBF02D60B60F003D0E06 /* WeatherTask */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CFC3CBF32D60B60F003D0E06 /* WeatherTask */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CFF915512D761CC6007E2B0B /* Exceptions for "WeatherTask" folder in "WeatherTask" target */,
+			);
 			path = WeatherTask;
 			sourceTree = "<group>";
 		};
@@ -334,6 +347,7 @@
 				DEVELOPMENT_TEAM = 6852L788XV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WeatherTask/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -363,6 +377,7 @@
 				DEVELOPMENT_TEAM = 6852L788XV;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = WeatherTask/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
