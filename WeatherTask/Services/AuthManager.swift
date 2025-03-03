@@ -53,20 +53,20 @@ final class AuthManager {
     }
 
     private func handleFirebaseError(_ error: Error) -> AuthError {
-        guard let errorCode = (error as NSError?)?.code else {
+        guard let errorCode = AuthErrorCode(rawValue: (error as NSError).code) else {
             return .unknownError
         }
 
         switch errorCode {
-        case AuthErrorCode.invalidEmail.rawValue:
+        case .invalidEmail:
             return .invalidEmail
-        case AuthErrorCode.emailAlreadyInUse.rawValue:
+        case .emailAlreadyInUse:
             return .emailAlreadyInUse
-        case AuthErrorCode.weakPassword.rawValue:
+        case .weakPassword:
             return .weakPassword
-        case AuthErrorCode.networkError.rawValue:
+        case .networkError:
             return .networkError
-        case AuthErrorCode.wrongPassword.rawValue, AuthErrorCode.userNotFound.rawValue:
+        case .wrongPassword, .userNotFound:
             return .incorrectCredentials
         default:
             return .unknownError

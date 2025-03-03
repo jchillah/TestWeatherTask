@@ -9,7 +9,7 @@ import SwiftUI
 
 struct WeatherTestView: View {
     @StateObject var locationManager = LocationManager()
-    var weatherManager = WeatherService()
+    var weatherManager = WeatherAPIService()
     @State var weather: ResponseData?
     @StateObject private var weatherViewModel = WeatherViewModel()
     

@@ -25,6 +25,7 @@ class RegistrationViewModel: ObservableObject {
 
     private let userRepository = UserRepository()
     private let authManager = AuthManager.shared
+    private let authError = AuthError.self
     private let logger = Logger(subsystem: "com.weathertask.app", category: "RegistrationViewModel")
     
     var isRegisterButtonEnabled: Bool {

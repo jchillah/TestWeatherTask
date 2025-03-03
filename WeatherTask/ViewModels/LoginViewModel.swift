@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FirebaseAuth
 
 @MainActor
 class LoginViewModel: ObservableObject {
@@ -18,10 +19,8 @@ class LoginViewModel: ObservableObject {
     @Published var user: User?
     @Published var isLoginSuccessful = false
 
-    
     private let userRepository = UserRepository()
     private let errorHandler = ErrorHandler()
-    
     
     init() {
         _ = AuthManager.shared
@@ -52,11 +51,10 @@ class LoginViewModel: ObservableObject {
         }
     }
     
-    func signIn() async throws {
+    func signIn() async {
         guard EmailValidator.isValid(email) else {
-            errorHandler.handle(error: AuthError.invalidEmail)
             DispatchQueue.main.async {
-                self.errorMessage = self.errorHandler.errorMessage
+                self.errorMessage = "Ungültige E-Mail-Adresse."
             }
             return
         }
@@ -69,17 +67,27 @@ class LoginViewModel: ObservableObject {
             DispatchQueue.main.async {
                 self.user = fetchedUser
                 self.isSignedIn = true
+                self.isLoginSuccessful = true
                 self.errorMessage = nil
                 self.navigateToMainTabView = true
             }
-        } catch {
-            errorHandler.handle(error: error)
+        } catch let error as NSError {
             DispatchQueue.main.async {
-                self.errorMessage = error.localizedDescription
+                switch AuthErrorCode(rawValue: Int(UInt(error.code))) {
+                case .emailAlreadyInUse:
+                    self.errorMessage = "E-Mail wird bereits verwendet."
+                case .wrongPassword:
+                    self.errorMessage = "Falsches Passwort."
+                case .userNotFound:
+                    self.errorMessage = "Benutzer nicht gefunden."
+                case .weakPassword:
+                    self.errorMessage = "Passwort zu schwach."
+                default:
+                    self.errorMessage = "Unbekannter Fehler: \(error.localizedDescription)"
+                }
             }
         }
     }
-
 
     func signOut() {
         Task {
