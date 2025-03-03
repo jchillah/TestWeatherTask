@@ -5,7 +5,6 @@
 //  Created by Michael Winkler on 03.03.25.
 //
 
-
 import CoreLocation
 import Foundation
 
