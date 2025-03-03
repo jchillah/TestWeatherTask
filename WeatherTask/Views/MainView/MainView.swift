@@ -9,22 +9,29 @@ import SwiftUI
 
 struct MainView: View {
     @StateObject private var weatherViewModel = WeatherViewModel()
-    
+
     var body: some View {
         NavigationStack {
             VStack {
-                Text("Current Temperature: \(weatherViewModel)")
-                    .font(.headline)
-                    .padding()
+                if weatherViewModel.isLoading {
+                    ProgressView("Lade Wetterdaten...")
+                } else {
+                    Text("Aktuelle Temperatur: \(weatherViewModel.temperature)")
+                        .font(.headline)
+                        .padding()
+                    Text("Bedingung: \(weatherViewModel.condition)")
+                        .font(.subheadline)
+                        .padding()
+                }
 
                 List {
-                    Text("Task 1")
-                    Text("Task 2")
-                    Text("Task 3")
+                    Text("Aufgabe 1")
+                    Text("Aufgabe 2")
+                    Text("Aufgabe 3")
                 }
                 .listStyle(.insetGrouped)
             }
-            .navigationTitle("Tasks")
+            .navigationTitle("Aufgaben")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: {}) {
@@ -32,15 +39,15 @@ struct MainView: View {
                     }
                 }
             }
-            .onAppear {
-                Task {
-                    weatherViewModel.fetchWeather()
-                }
+            .alert(item: $weatherViewModel.appError) { appError in
+                Alert(title: Text("Fehler"), message: Text(appError.errorString), dismissButton: .default(Text("OK")))
             }
         }
     }
 }
 
-#Preview {
-    MainView()
+struct MainView_Previews: PreviewProvider {
+    static var previews: some View {
+        MainView()
+    }
 }

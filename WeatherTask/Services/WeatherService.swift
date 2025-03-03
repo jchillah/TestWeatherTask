@@ -6,34 +6,36 @@
 //
 
 import Foundation
+import CoreLocation
 
-@MainActor
-class WeatherService {
-    private let apiKey = Secrets.apiKey
-    private let baseURL = "https://api.openweathermap.org/data/2.5/weather"
-    
-    // Wetter mit GPS-Koordinaten abrufen.
-    func fetchWeather(lat: Double, lon: Double) async throws -> WeatherData {
-        let urlString = "\(baseURL)?lat=\(lat)&lon=\(lon)&appid=\(apiKey)&units=metric"
-        return try await fetch(urlString: urlString)
-    }
-    
-    // Wetter mit Ortsnamen abrufen
-    func fetchWeather(for city: String) async throws -> WeatherData {
-        let urlString = "\(baseURL)?q=\(city)&appid=\(apiKey)&units=metric"
-        return try await fetch(urlString: urlString)
-    }
-    
-    private func fetch(urlString: String) async throws -> WeatherData {
+struct WeatherService {
+    private let apiKey = "YOUR_API_KEY"
+    private let baseURL = "https://api.openweathermap.org/data/2.5/forecast"
+
+    func fetchWeather(for location: CLLocationCoordinate2D) async throws -> WeatherResponse {
+        let urlString = "\(baseURL)?lat=\(location.latitude)&lon=\(location.longitude)&appid=\(apiKey)&units=metric"
         guard let url = URL(string: urlString) else {
-            throw URLError(.badURL)
+            throw WeatherServiceError.invalidURL
         }
-        
+
         let (data, response) = try await URLSession.shared.data(from: url)
-        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode == 200 else {
-            throw URLError(.badServerResponse)
+        guard (response as? HTTPURLResponse)?.statusCode == 200 else {
+            throw WeatherServiceError.invalidResponse
         }
-        
-        return try JSONDecoder().decode(WeatherData.self, from: data)
+
+        do {
+            let decoder = JSONDecoder()
+            decoder.dateDecodingStrategy = .secondsSince1970
+            let weatherResponse = try decoder.decode(WeatherResponse.self, from: data)
+            return weatherResponse
+        } catch {
+            throw WeatherServiceError.decodingError(error)
+        }
     }
+}
+
+enum WeatherServiceError: Error {
+    case invalidURL
+    case invalidResponse
+    case decodingError(Error)
 }
