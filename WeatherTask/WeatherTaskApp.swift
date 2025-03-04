@@ -19,7 +19,7 @@ struct WeatherTaskApp: App {
     var body: some Scene {
         WindowGroup {
             WeatherTestView()
-                .environmentObject(LocationManager())
+                .environmentObject(locationManager)
         }
     }
 }
