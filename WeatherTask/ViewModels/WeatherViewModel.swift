@@ -11,6 +11,7 @@ import SwiftUI
 import Combine
 import SwiftData
 import OSLog
+import FirebaseAuth
 
 @MainActor
 class WeatherViewModel: ObservableObject {
@@ -26,6 +27,7 @@ class WeatherViewModel: ObservableObject {
     
     // SwiftData-Manager (wird über den Initializer gesetzt)
     var weatherDataManager: WeatherDataManager?
+    var firestoreWeatherManager: FirestoreWeatherManager?
     
     // Logger für strukturiertes Logging
     private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "WeatherTask", category: "WeatherViewModel")
@@ -35,7 +37,7 @@ class WeatherViewModel: ObservableObject {
         if let context = modelContext {
             weatherDataManager = WeatherDataManager(modelContext: context)
         }
-        
+        firestoreWeatherManager = FirestoreWeatherManager()
         // Beobachte den Standort und lade Wetterdaten, wenn sich der Standort ändert
         locationManager.$location
             .compactMap { $0?.coordinate }
@@ -64,10 +66,9 @@ class WeatherViewModel: ObservableObject {
         Task {
             do {
                 // Abruf der Wetterdaten via APIService (async/await)
-                let apiKey = APIKeyManager.loadAPIKey() // 🔥 Hier wird der API-Key geladen
-
                 let weatherResponse: WeatherResponse = try await weatherService.fetchWeather(for: coordinate)
                 let data = WeatherData(from: weatherResponse)
+                
                 
                 // Da wir uns bereits im MainActor befinden, sind UI-Updates direkt möglich.
                 self.weatherData = data
@@ -77,6 +78,12 @@ class WeatherViewModel: ObservableObject {
                 
                 // Speichere die Wetterdaten in SwiftData, falls der Manager verfügbar ist
                 weatherDataManager?.saveWeatherData(data)
+                
+                // Speichere in Firestore (sofern ein User angemeldet ist)
+                if let userID = Auth.auth().currentUser?.uid {
+                    firestoreWeatherManager?.saveWeatherData(data, forUser: userID)
+                }
+                
                 logger.info("✅ Wetterdaten erfolgreich geladen und gespeichert.")
             } catch {
                 self.errorMessage = error.localizedDescription
@@ -88,7 +95,7 @@ class WeatherViewModel: ObservableObject {
     
     /// Beispiel-Funktion, um Wetterdaten über einen Stadtnamen abzurufen (async/await)
     func fetchWeatherCityName(for city: String) async {
-        let apiKey = APIKeyManager.loadAPIKey() // 🔥 Hier wird der API-Key geladen
+        let apiKey = APIKeyManager.loadAPIKey()
         let urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(apiKey)&units=metric"
         guard let url = URL(string: urlString) else {
             logger.error("Ungültige URL: \(urlString, privacy: .public)")
@@ -100,6 +107,9 @@ class WeatherViewModel: ObservableObject {
             let convertedData = WeatherData(from: response)
             self.weatherData = convertedData
             weatherDataManager?.saveWeatherData(convertedData)
+            if let userID = Auth.auth().currentUser?.uid {
+                firestoreWeatherManager?.saveWeatherData(convertedData, forUser: userID)
+            }
             logger.info("✅ Wetterdaten für \(city, privacy: .public) erfolgreich geladen und gespeichert.")
         } catch {
             logger.error("❌ Fehler beim Abrufen der Wetterdaten für \(city, privacy: .public): \(error.localizedDescription, privacy: .public)")
@@ -107,7 +117,7 @@ class WeatherViewModel: ObservableObject {
     }
     
     /// Beispiel für einen Callback-basierten API-Aufruf (nicht async/await)
-    func fetchWeather(lat: Double, lon: Double) {
+    func fetchWeatherCallback(lat: Double, lon: Double) {
         isLoading = true
         errorMessage = nil
         
@@ -119,6 +129,9 @@ class WeatherViewModel: ObservableObject {
             case .success(let weather):
                 self.weatherData = weather
                 self.weatherDataManager?.saveWeatherData(weather)
+                if let userID = Auth.auth().currentUser?.uid {
+                    self.firestoreWeatherManager?.saveWeatherData(weather, forUser: userID)
+                }
                 self.logger.info("✅ Wetterdaten erfolgreich über Callback geladen und gespeichert.")
             case .failure(let error):
                 self.errorMessage = "Fehler: \(error)"

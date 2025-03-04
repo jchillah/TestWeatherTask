@@ -12,8 +12,6 @@ struct WeatherTestView: View {
     @EnvironmentObject var locationManager: LocationManager
     @Environment(\.modelContext) private var modelContext
     @StateObject private var viewModel: WeatherViewModel
-    @State private var errorMessage: String? = nil
-
 
     init() {
         // Initialisiere das ViewModel zunächst ohne modelContext
@@ -34,25 +32,18 @@ struct WeatherTestView: View {
             }
             
             Button("Wetter für aktuellen Standort") {
-                            Task {
-                                if let coordinate = locationManager.location?.coordinate {
-                                    viewModel.fetchWeatherCoords(for: coordinate)
-                                    errorMessage = nil
-                                } else {
-                                    errorMessage = "Kein Standort verfügbar. Bitte Standort aktivieren."
-                                }
-                            }
-                        }
-                        .padding()
-
-                        if let errorMessage = errorMessage {
-                            Text(errorMessage)
-                                .foregroundColor(.red)
-                                .padding()
-                        }
+                Task {
+                    if let coordinate = locationManager.location?.coordinate {
+                        viewModel.fetchWeatherCoords(for: coordinate)
+                    } else {
+                        viewModel.errorMessage = "Kein Standort verfügbar. Bitte Standort aktivieren."
+                    }
+                }
+            }
+            .padding()
         }
         .onAppear {
-            // Hier setzen wir den ModelContext, sodass unser WeatherDataManager im ViewModel initialisiert werden kann
+            // Setze den ModelContext für den WeatherDataManager im ViewModel
             viewModel.weatherDataManager = WeatherDataManager(modelContext: modelContext)
         }
     }
@@ -61,6 +52,61 @@ struct WeatherTestView: View {
 #Preview {
     WeatherTestView()
 }
+
+
+//struct WeatherTestView: View {
+//    @EnvironmentObject var locationManager: LocationManager
+//    @Environment(\.modelContext) private var modelContext
+//    @StateObject private var viewModel: WeatherViewModel
+//    @State private var errorMessage: String? = nil
+//
+//
+//    init() {
+//        // Initialisiere das ViewModel zunächst ohne modelContext
+//        _viewModel = StateObject(wrappedValue: WeatherViewModel(modelContext: nil))
+//    }
+//    
+//    var body: some View {
+//        VStack {
+//            if viewModel.isLoading {
+//                ProgressView("Lade Wetterdaten…")
+//            } else if let error = viewModel.errorMessage {
+//                Text("Fehler: \(error)")
+//                    .foregroundColor(.red)
+//                    .padding()
+//            } else if viewModel.weatherData != nil {
+//                Text(viewModel.weatherInfo)
+//                    .padding()
+//            }
+//            
+//            Button("Wetter für aktuellen Standort") {
+//                            Task {
+//                                if let coordinate = locationManager.location?.coordinate {
+//                                    viewModel.fetchWeatherCoords(for: coordinate)
+//                                    errorMessage = nil
+//                                } else {
+//                                    errorMessage = "Kein Standort verfügbar. Bitte Standort aktivieren."
+//                                }
+//                            }
+//                        }
+//                        .padding()
+//
+//                        if let errorMessage = errorMessage {
+//                            Text(errorMessage)
+//                                .foregroundColor(.red)
+//                                .padding()
+//                        }
+//        }
+//        .onAppear {
+//            // Hier setzen wir den ModelContext, sodass unser WeatherDataManager im ViewModel initialisiert werden kann
+//            viewModel.weatherDataManager = WeatherDataManager(modelContext: modelContext)
+//        }
+//    }
+//}
+//
+//#Preview {
+//    WeatherTestView()
+//}
 
 
 //
