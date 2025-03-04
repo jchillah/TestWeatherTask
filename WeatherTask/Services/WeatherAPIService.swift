@@ -9,7 +9,7 @@ import Foundation
 import CoreLocation
 
 struct WeatherAPIService {
-    private let apiKey = Secrets.apiKey
+    private let apiKey = APIKeyManager.loadAPIKey()
     private let baseURL = "https://api.openweathermap.org/data/2.5/forecast"
 
     func fetchWeather(for location: CLLocationCoordinate2D) async throws -> WeatherResponse {
