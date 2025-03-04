@@ -8,10 +8,16 @@
 import Foundation
 
 struct APIKeyManager {
-    static func loadAPIKey() -> String {
+    static func loadAPIKey2() -> String {
         guard let apiKey = ProcessInfo.processInfo.environment[Secrets.apiKey] else {
             fatalError("Fehlender OpenWeather API-Schlüssel. Setze die 'OPEN_WEATHER_API_KEY' Umgebungsvariable.")
         }
         return apiKey
+    }
+    
+    static func loadAPIKey() -> String {
+        // Hier wird der API-Key aus Secrets.apiKey geladen.
+        // Stelle sicher, dass Secrets.apiKey korrekt definiert ist.
+        return Secrets.apiKey
     }
 }

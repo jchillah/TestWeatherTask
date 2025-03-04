@@ -59,6 +59,7 @@ struct WeatherData: Codable {
     struct Wind: Codable {
         let speed: Double
         let deg: Int
+        let gust: Double?
     }
 
     struct Clouds: Codable {
@@ -88,7 +89,7 @@ extension WeatherData {
             seaLevel: response.main.seaLevel,
             groundLevel: response.main.grndLevel
         )
-        self.wind = Wind(speed: response.wind.speed, deg: response.wind.deg)
+        self.wind = Wind(speed: response.wind.speed, deg: response.wind.deg, gust: response.wind.gust)
         self.clouds = Clouds(all: response.clouds.all)
         self.visibility = response.visibility
         self.dt = response.dt
@@ -104,5 +105,42 @@ extension WeatherData {
         self.id = response.id
         self.base = response.base
         self.cod = response.cod
+    }
+    
+    func toDictionary() -> [String: Any] {
+        return [
+            "coord": ["lon": self.coord.lon, "lat": self.coord.lat],
+            "weather": self.weather.map { ["id": $0.id, "main": $0.main, "description": $0.description, "icon": $0.icon] },
+            "main": [
+                "temp": self.main.temp,
+                "feels_like": self.main.feelsLike,
+                "temp_min": self.main.tempMin,
+                "temp_max": self.main.tempMax,
+                "pressure": self.main.pressure,
+                "humidity": self.main.humidity,
+                "sea_level": self.main.seaLevel ?? NSNull(),
+                "grnd_level": self.main.groundLevel ?? NSNull()
+            ],
+            "wind": [
+                "speed": self.wind.speed,
+                "deg": self.wind.deg,
+                "gust": self.wind.gust ?? NSNull()
+            ],
+            "clouds": ["all": self.clouds.all],
+            "visibility": self.visibility,
+            "dt": self.dt,
+            "sys": [
+                "type": self.sys.type ?? NSNull(),
+                "id": self.sys.id ?? NSNull(),
+                "country": self.sys.country,
+                "sunrise": self.sys.sunrise,
+                "sunset": self.sys.sunset
+            ],
+            "timezone": self.timezone,
+            "name": self.name,
+            "id": self.id,
+            "base": self.base,
+            "cod": self.cod
+        ]
     }
 }

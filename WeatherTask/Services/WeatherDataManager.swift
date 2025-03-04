@@ -10,8 +10,8 @@ import Foundation
 import OSLog
 
 class WeatherDataManager {
-    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "WeatherDataManager", category: "WeatherDataManager")
     let modelContext: ModelContext
+    private let logger = Logger(subsystem: Bundle.main.bundleIdentifier ?? "WeatherDataManager", category: "Persistence")
 
     init(modelContext: ModelContext) {
         self.modelContext = modelContext
@@ -20,19 +20,19 @@ class WeatherDataManager {
     func saveWeatherData(_ weatherData: WeatherData) {
         let entity = WeatherEntity.from(weatherData: weatherData)
         
-        // Prüfen, ob bereits ein Eintrag mit derselben ID existiert, um Duplikate zu vermeiden
+        // Verhindere doppelte Einträge
         let fetchDescriptor = FetchDescriptor<WeatherEntity>(predicate: #Predicate { $0.id == weatherData.id })
-        if let existingWeather = try? modelContext.fetch(fetchDescriptor).first {
-            modelContext.delete(existingWeather)
+        if let existing = try? modelContext.fetch(fetchDescriptor).first {
+            modelContext.delete(existing)
         }
-
+        
         modelContext.insert(entity)
-
+        
         do {
             try modelContext.save()
             logger.info("✅ Wetterdaten erfolgreich in SwiftData gespeichert!")
         } catch {
-                   logger.error("❌ Fehler beim Speichern der Wetterdaten: \(error.localizedDescription)")
+            logger.error("❌ Fehler beim Speichern in SwiftData: \(error.localizedDescription, privacy: .public)")
         }
     }
 }

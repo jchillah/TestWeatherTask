@@ -14,7 +14,7 @@ protocol WeatherRepositoryProtocol {
 
 class WeatherRepository: WeatherRepositoryProtocol {
     func fetchWeather(for location: CLLocationCoordinate2D) async throws -> WeatherData {
-        let apiKey = APIKeyManager.loadAPIKey() // 🔥 Hier wird der API-Key geladen
+        let apiKey = APIKeyManager.loadAPIKey()
         let urlString = "https://api.openweathermap.org/data/2.5/weather?lat=\(location.latitude)&lon=\(location.longitude)&appid=\(apiKey)&units=metric&lang=de"
         
         guard let url = URL(string: urlString) else {
