@@ -9,18 +9,20 @@ import SwiftUI
 
 struct WeatherTestView: View {
     @StateObject var locationManager = LocationManager()
-    var weatherManager = WeatherAPIService()
-    @State var weather: ResponseData?
     @StateObject private var weatherViewModel = WeatherViewModel()
-    
+
     var body: some View {
         VStack {
             Text(weatherViewModel.weatherInfo)
                 .padding()
-            
+
             Button("Wetter für aktuellen Standort") {
                 Task {
-                    weatherViewModel.getWeatherForecast()
+                    if let coordinate = locationManager.location?.coordinate {
+                        weatherViewModel.fetchWeather(for: coordinate)
+                    } else {
+                        print("Kein Standort verfügbar")
+                    }
                 }
             }
             .padding()
