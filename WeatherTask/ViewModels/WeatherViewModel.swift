@@ -40,7 +40,7 @@ class WeatherViewModel: ObservableObject {
         locationManager.$location
             .compactMap { $0?.coordinate }
             .sink { [weak self] coordinate in
-                self?.fetchWeather(for: coordinate)
+                self?.fetchWeatherCoords(for: coordinate)
             }
             .store(in: &cancellables)
     }
@@ -59,11 +59,13 @@ class WeatherViewModel: ObservableObject {
     
     
     /// Lädt die Wetterdaten für die übergebenen Koordinaten und speichert sie in SwiftData
-    func fetchWeather(for coordinate: CLLocationCoordinate2D) {
+    func fetchWeatherCoords(for coordinate: CLLocationCoordinate2D) {
         isLoading = true
         Task {
             do {
                 // Abruf der Wetterdaten via APIService (async/await)
+                let apiKey = APIKeyManager.loadAPIKey() // 🔥 Hier wird der API-Key geladen
+
                 let weatherResponse: WeatherResponse = try await weatherService.fetchWeather(for: coordinate)
                 let data = WeatherData(from: weatherResponse)
                 
@@ -85,8 +87,8 @@ class WeatherViewModel: ObservableObject {
     }
     
     /// Beispiel-Funktion, um Wetterdaten über einen Stadtnamen abzurufen (async/await)
-    func fetchWeather(for city: String) async {
-        let apiKey = "DEIN_API_KEY" // Ersetze durch deinen API-Key oder lade ihn sicher
+    func fetchWeatherCityName(for city: String) async {
+        let apiKey = APIKeyManager.loadAPIKey() // 🔥 Hier wird der API-Key geladen
         let urlString = "https://api.openweathermap.org/data/2.5/weather?q=\(city)&appid=\(apiKey)&units=metric"
         guard let url = URL(string: urlString) else {
             logger.error("Ungültige URL: \(urlString, privacy: .public)")

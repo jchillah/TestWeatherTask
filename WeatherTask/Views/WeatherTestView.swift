@@ -36,7 +36,7 @@ struct WeatherTestView: View {
             Button("Wetter für aktuellen Standort") {
                             Task {
                                 if let coordinate = locationManager.location?.coordinate {
-                                    viewModel.fetchWeather(for: coordinate)
+                                    viewModel.fetchWeatherCoords(for: coordinate)
                                     errorMessage = nil
                                 } else {
                                     errorMessage = "Kein Standort verfügbar. Bitte Standort aktivieren."
