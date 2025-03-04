@@ -39,8 +39,11 @@ struct MainView: View {
                     }
                 }
             }
-            .alert(item: $weatherViewModel.appError) { appError in
-                Alert(title: Text("Fehler"), message: Text(appError.errorString), dismissButton: .default(Text("OK")))
+            .alert(isPresented: Binding<Bool>(
+                get: { weatherViewModel.errorMessage != nil },
+                set: { if !$0 { weatherViewModel.errorMessage = nil } }
+            )) {
+                Alert(title: Text("Fehler"), message: Text(weatherViewModel.errorMessage ?? "Unbekannter Fehler"), dismissButton: .default(Text("OK")))
             }
         }
     }
