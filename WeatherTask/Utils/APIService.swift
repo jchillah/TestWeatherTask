@@ -7,6 +7,63 @@
 import CoreLocation
 import Foundation
 
+//public class APIService {
+//    public static let shared = APIService()
+//    
+//    public enum APIError: Error {
+//        case invalidURL
+//        case invalidResponse(statusCode: Int)
+//        case dataCorrupt
+//        case decodingError(String)
+//        case networkError(String)
+//    }
+//    
+//    public func getJSON<T: Decodable>(
+//        endpoint: String,
+//        parameters: [String: String] = [:],
+//        dateDecodingStrategy: JSONDecoder.DateDecodingStrategy = .deferredToDate,
+//        keyDecodingStrategy: JSONDecoder.KeyDecodingStrategy = .useDefaultKeys,
+//        completion: @escaping (Result<T, APIError>) -> Void
+//    ) {
+//        // Erstelle die URL (Beispiel: mit API-Key, falls nötig)
+//        // ...
+//        guard let url = URL(string: urlString) else {
+//            completion(.failure(.invalidURL))
+//            return
+//        }
+//        
+//        URLSession.shared.dataTask(with: URLRequest(url: url)) { (data, response, error) in
+//            if let err = error {
+//                completion(.failure(.networkError(err.localizedDescription)))
+//                return
+//            }
+//            guard let data = data else {
+//                completion(.failure(.dataCorrupt))
+//                return
+//            }
+//            
+//            if let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode != 200 {
+//                completion(.failure(.invalidResponse(statusCode: httpResponse.statusCode)))
+//                return
+//            }
+//            
+//            let decoder = JSONDecoder()
+//            decoder.dateDecodingStrategy = dateDecodingStrategy
+//            decoder.keyDecodingStrategy = keyDecodingStrategy
+//            
+//            do {
+//                let decodedData = try decoder.decode(T.self, from: data)
+//                completion(.success(decodedData))
+//            } catch {
+//                completion(.failure(.decodingError(error.localizedDescription)))
+//            }
+//        }.resume()
+//    }
+//}
+
+
+
+//
 public class APIService {
     public static let shared = APIService()
 

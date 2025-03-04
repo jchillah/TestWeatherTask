@@ -6,13 +6,18 @@
 //
 
 import Foundation
+import SwiftUI
+
+// Verwende eigene Aliase, um Konflikte zu vermeiden
+typealias EntryMain = WeatherData.Main
+typealias EntryWeather = WeatherData.Weather
 
 struct WeatherEntry: Codable {
-    let main: Main
-    let weather: [Weather]
+    let main: EntryMain
+    let weather: [EntryWeather]
     let dt: Int
     
     var date: Date {
-        return Date(timeIntervalSince1970: TimeInterval(dt))
+        Date(timeIntervalSince1970: TimeInterval(dt))
     }
 }

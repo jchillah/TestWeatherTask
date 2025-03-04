@@ -10,11 +10,10 @@ import FirebaseCore
 
 @main
 struct WeatherTaskApp: App {
-    @StateObject var locationManager = LocationManager()
+    // Integriere den AppDelegate, der das Protokoll erfüllt:
+    @UIApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     
-    init() {
-        FirebaseApp.configure()
-    }
+    @StateObject var locationManager = LocationManager()
     
     var body: some Scene {
         WindowGroup {
